@@ -6,13 +6,16 @@ import rasterio as rio
 from shapely.geometry import box
 import geopandas as gpd
 import os
-os.chdir('D:/ENEA_CAS_WORK/sentinel5p/ncfiles/outputs')
+os.chdir('D:/ENEA_CAS_WORK/sentinel5p/outputs')
 os.getcwd()
 
 #Open raster file
 driver=gdal.GetDriverByName('GTiff')
 driver.Register()
-ds = gdal.Open('NO2_Sentinel5p_FEBRUARY.tif')
+
+#### set month
+MONTH = 'NOVEMBER'  # FEBRUARY, MAY, AUGUST, NOVEMBER
+ds = gdal.Open('NO2_Sentinel5p_' + MONTH + '.tif')
 
 if ds is None:
     print('Could not open')
@@ -42,12 +45,13 @@ dataimage[dataimage[:,:]==-340282346638528859811704183484516925440.000]=0
 ########################################################
 ### create a rectangle around the extent of the shp file
 
-raster = rio.open("NO2_Sentinel5p_FEBRUARY.tif")
+# raster = rio.open("NO2_Sentinel5p_FEBRUARY.tif")
+raster = rio.open('NO2_Sentinel5p_' + MONTH + '.tif')
 bounds  = raster.bounds
 
 geom = box(*bounds)
-print(geom.wkt)
-border = gpd.GeoDataFrame({"id":1,"geometry":[box(*bounds)]}, crs={'init': 'epsg:4326'})
+# print(geom.wkt)
+# border = gpd.GeoDataFrame({"id":1,"geometry":[box(*bounds)]}, crs={'init': 'epsg:4326'})
 # hex_grid = gpd.GeoDataFrame({'geometry': array_of_hexes}, crs={'init': 'epsg:4326'})
 
 
@@ -86,6 +90,5 @@ folium.raster_layers.ImageOverlay(
 ).add_to(map)
 
 #Save html
-map.save('NO2_FEBRURY_2019_Sentinel5p.html')
-
+map.save('NO2_' + MONTH + '_2019_Sentinel5p.html')
 
